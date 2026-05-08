@@ -23,6 +23,7 @@ const schema = z
     last_name: z.string().trim().min(1, "Last name required").max(50),
     email: z.string().trim().email("Invalid email").max(255),
     phone: z.string().trim().max(20).optional().or(z.literal("")),
+    username: z.string().trim().min(3, "Username must be at least 3 characters").max(30),
     password: z.string().min(6, "Password must be at least 6 characters").max(72),
     confirm: z.string(),
   })
