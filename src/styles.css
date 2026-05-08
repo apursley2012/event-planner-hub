@@ -66,7 +66,9 @@
   --color-coral: var(--coral);
   --color-coral-foreground: var(--coral-foreground);
   --color-surface: var(--surface);
-  --font-display: "Playfair Display", Georgia, serif;
+  --font-display: "Cormorant Upright", Georgia, serif;
+  --font-body: "Aref Ruqaa", Georgia, serif;
+  --font-date: "Berkshire Swash", cursive;
 }
 
 :root {
