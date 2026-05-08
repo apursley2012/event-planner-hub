@@ -29,7 +29,7 @@ const TABS: { key: "all" | EventType; label: string }[] = [
   { key: "trip", label: "Trips" },
 ];
 
-const TYPE_ICON: Record<EventType, JSX.Element> = {
+const TYPE_ICON: Record<EventType, React.ReactNode> = {
   birthday: <Cake size={18} />,
   appointment: <Calendar size={18} />,
   trip: <Plane size={18} />,
