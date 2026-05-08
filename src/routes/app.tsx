@@ -1,3 +1,4 @@
+import type * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Search, ChevronLeft, ChevronRight, Cake, Calendar, Plane, Clock, Trash2 } from "lucide-react";
