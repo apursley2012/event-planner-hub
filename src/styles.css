@@ -59,18 +59,35 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-header: var(--header);
+  --color-header-foreground: var(--header-foreground);
+  --color-teal: var(--teal);
+  --color-teal-foreground: var(--teal-foreground);
+  --color-coral: var(--coral);
+  --color-coral-foreground: var(--coral-foreground);
+  --color-surface: var(--surface);
+  --font-display: "Playfair Display", Georgia, serif;
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --radius: 1.25rem;
+  /* PunctuOwlity palette */
+  --background: oklch(0.88 0.03 240);            /* light blue */
+  --foreground: oklch(0.25 0.08 265);            /* navy */
+  --header: oklch(0.68 0.16 22);                 /* coral red */
+  --header-foreground: oklch(0.99 0.01 240);
+  --teal: oklch(0.74 0.10 195);                  /* teal accent */
+  --teal-foreground: oklch(0.25 0.08 265);
+  --coral: oklch(0.68 0.16 22);
+  --coral-foreground: oklch(0.99 0.01 240);
+  --surface: oklch(0.99 0.005 240);              /* white-ish input/card */
+  --shadow-soft: 0 6px 24px -8px oklch(0.25 0.08 265 / 0.25);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.68 0.16 22);
+  --primary-foreground: oklch(0.99 0.01 240);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
@@ -137,8 +154,40 @@
     border-color: var(--color-border);
   }
 
-  body {
+  html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    min-height: 100%;
   }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 700;
+  }
+  .pill-input {
+    background-color: var(--color-surface);
+    border-radius: 9999px;
+    padding: 0.85rem 1.25rem;
+    border: 1px solid transparent;
+    box-shadow: var(--shadow-soft);
+    width: 100%;
+    color: var(--color-foreground);
+    outline: none;
+  }
+  .pill-input:focus {
+    border-color: var(--color-teal);
+  }
+  .pill-btn {
+    border-radius: 9999px;
+    padding: 0.75rem 2.5rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.1s ease, opacity 0.15s ease;
+  }
+  .pill-btn:hover { transform: translateY(-1px); }
+  .pill-btn:active { transform: translateY(0); }
+  .pill-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 }
