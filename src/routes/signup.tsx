@@ -36,6 +36,7 @@ function SignupPage() {
     last_name: "",
     email: "",
     phone: "",
+    username: "",
     password: "",
     confirm: "",
   });
