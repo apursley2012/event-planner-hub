@@ -23,6 +23,7 @@ const schema = z
     last_name: z.string().trim().min(1, "Last name required").max(50),
     email: z.string().trim().email("Invalid email").max(255),
     phone: z.string().trim().max(20).optional().or(z.literal("")),
+    username: z.string().trim().min(3, "Username must be at least 3 characters").max(30),
     password: z.string().min(6, "Password must be at least 6 characters").max(72),
     confirm: z.string(),
   })
@@ -35,6 +36,7 @@ function SignupPage() {
     last_name: "",
     email: "",
     phone: "",
+    username: "",
     password: "",
     confirm: "",
   });
@@ -61,6 +63,7 @@ function SignupPage() {
           first_name: parsed.data.first_name,
           last_name: parsed.data.last_name,
           phone: parsed.data.phone || null,
+          username: parsed.data.username,
         },
       },
     });
@@ -85,7 +88,7 @@ function SignupPage() {
           <input className="pill-input" placeholder="Last Name" value={form.last_name} onChange={upd("last_name")} required />
           <input className="pill-input" type="email" placeholder="Email Address" value={form.email} onChange={upd("email")} required />
           <input className="pill-input" type="tel" placeholder="Phone (optional, for SMS alerts)" value={form.phone} onChange={upd("phone")} />
-          <input className="pill-input" placeholder="Username" value={form.first_name + form.last_name ? undefined : undefined} onChange={() => {}} hidden />
+          <input className="pill-input" placeholder="Username" value={form.username} onChange={upd("username")} required />
           <div className="relative">
             <input
               className="pill-input pr-12"
