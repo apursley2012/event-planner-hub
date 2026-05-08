@@ -154,8 +154,40 @@
     border-color: var(--color-border);
   }
 
-  body {
+  html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    min-height: 100%;
   }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 700;
+  }
+  .pill-input {
+    background-color: var(--color-surface);
+    border-radius: 9999px;
+    padding: 0.85rem 1.25rem;
+    border: 1px solid transparent;
+    box-shadow: var(--shadow-soft);
+    width: 100%;
+    color: var(--color-foreground);
+    outline: none;
+  }
+  .pill-input:focus {
+    border-color: var(--color-teal);
+  }
+  .pill-btn {
+    border-radius: 9999px;
+    padding: 0.75rem 2.5rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.1s ease, opacity 0.15s ease;
+  }
+  .pill-btn:hover { transform: translateY(-1px); }
+  .pill-btn:active { transform: translateY(0); }
+  .pill-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 }
