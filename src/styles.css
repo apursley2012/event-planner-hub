@@ -73,23 +73,23 @@
 
 :root {
   --radius: 1.25rem;
-  /* PunctuOwlity palette */
-  --background: oklch(0.88 0.03 240);            /* light blue */
-  --foreground: oklch(0.25 0.08 265);            /* navy */
-  --header: oklch(0.68 0.16 22);                 /* coral red */
-  --header-foreground: oklch(0.99 0.01 240);
-  --teal: oklch(0.74 0.10 195);                  /* teal accent */
-  --teal-foreground: oklch(0.25 0.08 265);
-  --coral: oklch(0.68 0.16 22);
-  --coral-foreground: oklch(0.99 0.01 240);
-  --surface: oklch(0.99 0.005 240);              /* white-ish input/card */
-  --shadow-soft: 0 6px 24px -8px oklch(0.25 0.08 265 / 0.25);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.68 0.16 22);
-  --primary-foreground: oklch(0.99 0.01 240);
+  /* PunctuOwlity palette - exact hex values */
+  --background: #C1D5E6;                         /* light blue */
+  --foreground: #000050;                         /* dark navy text */
+  --header: #ec5b5b;                             /* coral toolbar/FAB */
+  --header-foreground: #ffffff;
+  --teal: #33CCCC;                               /* teal accent */
+  --teal-foreground: #000050;
+  --coral: #ec5b5b;
+  --coral-foreground: #ffffff;
+  --surface: #ffffff;                            /* white input/card */
+  --shadow-soft: 0 6px 24px -8px rgb(0 0 80 / 0.25);
+  --card: #ffffff;
+  --card-foreground: #000050;
+  --popover: #ffffff;
+  --popover-foreground: #000050;
+  --primary: #ec5b5b;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
