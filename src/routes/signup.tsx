@@ -63,6 +63,7 @@ function SignupPage() {
           first_name: parsed.data.first_name,
           last_name: parsed.data.last_name,
           phone: parsed.data.phone || null,
+          username: parsed.data.username,
         },
       },
     });
