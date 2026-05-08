@@ -88,7 +88,7 @@ function SignupPage() {
           <input className="pill-input" placeholder="Last Name" value={form.last_name} onChange={upd("last_name")} required />
           <input className="pill-input" type="email" placeholder="Email Address" value={form.email} onChange={upd("email")} required />
           <input className="pill-input" type="tel" placeholder="Phone (optional, for SMS alerts)" value={form.phone} onChange={upd("phone")} />
-          <input className="pill-input" placeholder="Username" value={form.first_name + form.last_name ? undefined : undefined} onChange={() => {}} hidden />
+          <input className="pill-input" placeholder="Username" value={form.username} onChange={upd("username")} required />
           <div className="relative">
             <input
               className="pill-input pr-12"
