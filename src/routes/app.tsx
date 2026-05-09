@@ -204,7 +204,7 @@ function AppPage() {
 function Stat({ label, value, variant }: { label: string; value: number; variant: "coral" | "teal" }) {
   const cls = variant === "coral" ? "bg-coral text-coral-foreground" : "bg-teal text-teal-foreground";
   return (
-    <div className={`${cls} rounded-2xl py-3 text-center shadow-[var(--shadow-soft)]`}>
+    <div className={`${cls} py-3 text-center shadow-[var(--shadow-soft)] border-dotted border-white border-8 rounded-full`}>
       <div className="text-2xl font-bold">{value}</div>
       <div className="text-xs font-semibold mt-0.5">{label}</div>
     </div>
