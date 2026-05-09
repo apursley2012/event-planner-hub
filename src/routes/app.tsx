@@ -1,12 +1,14 @@
 import type * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search, ChevronLeft, ChevronRight, Cake, Calendar, Plane, Clock, Trash2 } from "lucide-react";
+import { Plus, Search, ChevronLeft, ChevronRight, Cake, Calendar, Plane, Clock, Trash2, MapPin, CalendarPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { AppHeader } from "@/components/AppHeader";
 import { Logo } from "@/components/Logo";
+import { NotificationPrompt } from "@/components/NotificationPrompt";
+import { scheduleReminders, cancelAllReminders } from "@/lib/reminders";
 
 export const Route = createFileRoute("/app")({
   head: () => ({ meta: [{ title: "My Events — PunctuOwlity" }] }),
@@ -31,16 +33,24 @@ const TABS: { key: "all" | EventType; label: string }[] = [
 ];
 
 const TYPE_ICON: Record<EventType, React.ReactNode> = {
-  birthday: <Cake size={18} />,
-  appointment: <Calendar size={18} />,
-  trip: <Plane size={18} />,
-  other: <Clock size={18} />,
+  birthday: <Cake size={20} />,
+  appointment: <Calendar size={20} />,
+  trip: <Plane size={20} />,
+  other: <Clock size={20} />,
+};
+
+const TYPE_LABEL: Record<EventType, string> = {
+  birthday: "Birthday",
+  appointment: "Appointment",
+  trip: "Trip",
+  other: "Event",
 };
 
 function AppPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [events, setEvents] = useState<EventRow[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("all");
   const [search, setSearch] = useState("");
   const [month, setMonth] = useState(() => {
@@ -55,10 +65,12 @@ function AppPage() {
 
   const load = async () => {
     if (!user) return;
+    setLoadingEvents(true);
     const { data, error } = await supabase
       .from("events")
       .select("*")
       .order("event_date", { ascending: true });
+    setLoadingEvents(false);
     if (error) {
       toast.error(error.message);
       return;
@@ -70,6 +82,12 @@ function AppPage() {
     if (user) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Schedule reminders whenever events change
+  useEffect(() => {
+    scheduleReminders(events.map((e) => ({ id: e.id, title: e.title, event_date: e.event_date, location: e.location })));
+    return () => cancelAllReminders();
+  }, [events]);
 
   const today = new Date();
   const stats = useMemo(() => {
@@ -116,12 +134,14 @@ function AppPage() {
     <div className="min-h-screen flex flex-col">
       <AppHeader showLogout />
       <main className="flex-1 px-4 pt-6 pb-24 max-w-3xl mx-auto w-full">
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center animate-fade-in">
           <Logo size={110} />
           <h1 className="font-display text-2xl mt-1 text-foreground">Upcoming Events</h1>
         </div>
 
-        <div className="grid grid-cols-4 gap-3 mt-6">
+        <NotificationPrompt />
+
+        <div className="grid grid-cols-4 gap-3 mt-6 animate-fade-in">
           <Stat label="Total" value={stats.total} variant="coral" />
           <Stat label="Today" value={stats.today} variant="teal" />
           <Stat label="Upcoming" value={stats.upcoming} variant="teal" />
@@ -139,13 +159,21 @@ function AppPage() {
         </div>
 
         <div className="mt-6 bg-teal text-teal-foreground rounded-2xl py-3 px-4 flex items-center justify-between shadow-[var(--shadow-soft)]">
-          <button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Prev">
+          <button
+            onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
+            aria-label="Prev"
+            className="hover:scale-110 transition-transform"
+          >
             <ChevronLeft />
           </button>
           <h2 className="font-display text-xl">
             {month.toLocaleDateString(undefined, { month: "long", year: "numeric" })}
           </h2>
-          <button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Next">
+          <button
+            onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}
+            aria-label="Next"
+            className="hover:scale-110 transition-transform"
+          >
             <ChevronRight />
           </button>
         </div>
@@ -157,8 +185,8 @@ function AppPage() {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`pb-2 font-display text-base whitespace-nowrap ${
-                  active ? "text-teal border-b-2 border-foreground" : "text-foreground/70"
+                className={`pb-2 font-display text-base whitespace-nowrap transition-colors ${
+                  active ? "text-foreground border-b-2 border-coral" : "text-foreground/60 hover:text-foreground"
                 }`}
               >
                 {t.label}
@@ -168,13 +196,20 @@ function AppPage() {
         </nav>
 
         <div className="mt-6 space-y-3">
-          {visible.length === 0 ? (
-            <div className="text-center py-16 text-foreground/70">
-              <p className="font-display text-lg">No events found.</p>
-              <p className="text-sm mt-1">Tap the + button to add one.</p>
-            </div>
+          {loadingEvents ? (
+            <LoadingSkeleton />
+          ) : visible.length === 0 ? (
+            <EmptyState onAdd={() => setShowForm(true)} />
           ) : (
-            visible.map((e) => <EventCard key={e.id} event={e} onDelete={() => removeEvent(e.id)} />)
+            visible.map((e, i) => (
+              <div
+                key={e.id}
+                className="animate-fade-in"
+                style={{ animationDelay: `${Math.min(i * 60, 400)}ms`, animationFillMode: "backwards" }}
+              >
+                <EventCard event={e} onDelete={() => removeEvent(e.id)} />
+              </div>
+            ))
           )}
         </div>
       </main>
@@ -182,9 +217,9 @@ function AppPage() {
       <button
         onClick={() => setShowForm(true)}
         aria-label="Add event"
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-coral text-coral-foreground flex items-center justify-center shadow-[var(--shadow-soft)] hover:scale-105 transition"
+        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-coral text-coral-foreground flex items-center justify-center shadow-[var(--shadow-soft)] hover:scale-110 active:scale-95 transition-transform ring-4 ring-white"
       >
-        <Plus size={26} />
+        <Plus size={28} />
       </button>
 
       {showForm && user && (
@@ -202,35 +237,94 @@ function AppPage() {
 }
 
 function Stat({ label, value, variant }: { label: string; value: number; variant: "coral" | "teal" }) {
-  const cls = variant === "coral" ? "bg-coral text-coral-foreground" : "bg-teal text-teal-foreground";
+  const cls = variant === "coral" ? "bg-coral" : "bg-teal";
   return (
-    <div className={`${cls} py-3 text-center border-white border-4 border-solid opacity-100 rounded-lg shadow-lg ring-2 ring-black`}>
+    <div
+      className={`${cls} text-foreground py-3 text-center border-white border-4 border-solid rounded-lg shadow-lg ring-2 ring-foreground hover:scale-105 transition-transform`}
+    >
       <div className="text-2xl font-bold">{value}</div>
       <div className="text-xs font-semibold mt-0.5">{label}</div>
     </div>
   );
 }
 
+function LoadingSkeleton() {
+  return (
+    <>
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          className="bg-surface rounded-2xl p-4 shadow-[var(--shadow-soft)] flex items-center gap-4 animate-pulse"
+        >
+          <div className="w-16 h-16 rounded-xl bg-foreground/10" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-foreground/10 rounded w-2/3" />
+            <div className="h-3 bg-foreground/10 rounded w-1/2" />
+            <div className="h-3 bg-foreground/10 rounded w-1/3" />
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function EmptyState({ onAdd }: { onAdd: () => void }) {
+  return (
+    <div className="text-center py-14 animate-fade-in">
+      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-teal text-teal-foreground mb-4 ring-4 ring-white shadow-[var(--shadow-soft)]">
+        <CalendarPlus size={36} />
+      </div>
+      <p className="font-display text-xl text-foreground">No events this month.</p>
+      <p className="text-sm mt-2 text-foreground/70 max-w-xs mx-auto">
+        Tap below to add one — we'll send a friendly reminder when it's almost time.
+      </p>
+      <button
+        onClick={onAdd}
+        className="pill-btn bg-coral text-coral-foreground mt-5 inline-flex items-center gap-2"
+      >
+        <Plus size={18} /> Add an event
+      </button>
+    </div>
+  );
+}
+
 function EventCard({ event, onDelete }: { event: EventRow; onDelete: () => void }) {
   const d = new Date(event.event_date);
+  const accent = event.event_type === "birthday" || event.event_type === "trip" ? "bg-coral text-coral-foreground" : "bg-teal text-teal-foreground";
   return (
-    <div className="bg-surface rounded-2xl p-4 shadow-[var(--shadow-soft)] flex items-start gap-3">
-      <div className="w-10 h-10 rounded-full bg-teal text-teal-foreground flex items-center justify-center shrink-0">
-        {TYPE_ICON[event.event_type]}
+    <div className="bg-surface rounded-2xl p-4 shadow-[var(--shadow-soft)] flex items-stretch gap-4 hover:-translate-y-0.5 hover:shadow-xl transition-all border-2 border-transparent hover:border-foreground/10">
+      <div className={`${accent} rounded-xl flex flex-col items-center justify-center w-20 shrink-0 px-2 py-2`}>
+        <div className="text-[10px] font-bold uppercase tracking-wider opacity-90">
+          {d.toLocaleDateString(undefined, { month: "short" })}
+        </div>
+        <div className="font-date text-4xl leading-none mt-0.5">{d.getDate()}</div>
+        <div className="text-[10px] font-semibold mt-0.5 opacity-90">
+          {d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
+        </div>
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="font-display text-lg truncate">{event.title}</h3>
-          <button onClick={onDelete} aria-label="Delete" className="text-coral hover:opacity-70">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 text-foreground/60 text-xs font-semibold uppercase tracking-wide">
+              <span className="text-foreground/80">{TYPE_ICON[event.event_type]}</span>
+              {TYPE_LABEL[event.event_type]}
+            </div>
+            <h3 className="font-display text-xl text-foreground truncate mt-0.5">{event.title}</h3>
+          </div>
+          <button
+            onClick={onDelete}
+            aria-label="Delete"
+            className="text-coral hover:bg-coral/10 rounded-full p-1.5 transition shrink-0"
+          >
             <Trash2 size={18} />
           </button>
         </div>
-        <p className="text-sm text-foreground/70">
-          {d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })} ·{" "}
-          {d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
-        </p>
-        {event.location && <p className="text-sm text-foreground/70">📍 {event.location}</p>}
-        {event.description && <p className="text-sm mt-1">{event.description}</p>}
+        {event.location && (
+          <p className="text-sm text-foreground/70 mt-1 flex items-center gap-1">
+            <MapPin size={14} /> {event.location}
+          </p>
+        )}
+        {event.description && <p className="text-sm mt-1 text-foreground/80 line-clamp-2">{event.description}</p>}
       </div>
     </div>
   );
@@ -279,8 +373,8 @@ function EventForm({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-foreground/40 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-background rounded-3xl p-6 w-full max-w-md shadow-xl" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 bg-foreground/40 flex items-end sm:items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-background rounded-3xl p-6 w-full max-w-md shadow-xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
         <h2 className="font-display text-xl mb-4 text-center">New Event</h2>
         <form onSubmit={submit} className="space-y-3">
           <input className="pill-input" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
