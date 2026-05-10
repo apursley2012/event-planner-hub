@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search, ChevronLeft, ChevronRight, Cake, Calendar, Plane, Clock, Trash2, MapPin, CalendarPlus } from "lucide-react";
+import { Plus, Search, ChevronLeft, ChevronRight, Trash2, Pencil, BellRing, BellOff, CalendarPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -31,13 +31,6 @@ const TABS: { key: "all" | EventType; label: string }[] = [
   { key: "appointment", label: "Appointments" },
   { key: "trip", label: "Trips" },
 ];
-
-const TYPE_ICON: Record<EventType, React.ReactNode> = {
-  birthday: <Cake size={20} />,
-  appointment: <Calendar size={20} />,
-  trip: <Plane size={20} />,
-  other: <Clock size={20} />,
-};
 
 const TYPE_LABEL: Record<EventType, string> = {
   birthday: "Birthday",
@@ -141,13 +134,6 @@ function AppPage() {
 
         <NotificationPrompt />
 
-        <div className="grid grid-cols-4 gap-3 mt-6 animate-fade-in">
-          <Stat label="Total" value={stats.total} variant="coral" />
-          <Stat label="Today" value={stats.today} variant="teal" />
-          <Stat label="Upcoming" value={stats.upcoming} variant="teal" />
-          <Stat label="Past" value={stats.past} variant="coral" />
-        </div>
-
         <div className="relative mt-6">
           <input
             className="pill-input pr-12"
@@ -158,7 +144,7 @@ function AppPage() {
           <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
         </div>
 
-        <div className="mt-6 bg-teal text-teal-foreground rounded-2xl py-3 px-4 flex items-center justify-between shadow-[var(--shadow-soft)]">
+        <div className="mt-6 bg-teal text-foreground rounded-2xl py-3 px-4 flex items-center justify-between shadow-[var(--shadow-soft)]">
           <button
             onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
             aria-label="Prev"
@@ -166,7 +152,7 @@ function AppPage() {
           >
             <ChevronLeft />
           </button>
-          <h2 className="font-display text-xl">
+          <h2 className="font-display text-xl underline decoration-2 underline-offset-4">
             {month.toLocaleDateString(undefined, { month: "long", year: "numeric" })}
           </h2>
           <button
@@ -178,15 +164,17 @@ function AppPage() {
           </button>
         </div>
 
-        <nav className="mt-5 flex gap-6 border-b border-foreground/10 overflow-x-auto">
+        <div className="mt-4 border-t-4 border-dotted border-foreground" />
+
+        <nav className="flex gap-6 overflow-x-auto py-2 justify-between">
           {TABS.map((t) => {
             const active = tab === t.key;
             return (
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`pb-2 font-display text-base whitespace-nowrap transition-colors ${
-                  active ? "text-foreground border-b-2 border-coral" : "text-foreground/60 hover:text-foreground"
+                className={`pb-1 font-display text-base whitespace-nowrap transition-colors ${
+                  active ? "text-foreground border-b-2 border-foreground" : "text-foreground/60 hover:text-foreground"
                 }`}
               >
                 {t.label}
@@ -195,11 +183,15 @@ function AppPage() {
           })}
         </nav>
 
-        <div className="mt-6 space-y-3">
+        <div className="border-t-4 border-dotted border-foreground" />
+
+        <div className="mt-5 grid grid-cols-2 gap-3">
           {loadingEvents ? (
             <LoadingSkeleton />
           ) : visible.length === 0 ? (
-            <EmptyState onAdd={() => setShowForm(true)} />
+            <div className="col-span-2">
+              <EmptyState onAdd={() => setShowForm(true)} />
+            </div>
           ) : (
             visible.map((e, i) => (
               <div
@@ -212,6 +204,8 @@ function AppPage() {
             ))
           )}
         </div>
+
+        <div className="mt-6 border-t-4 border-dotted border-foreground" />
       </main>
 
       <button
@@ -236,32 +230,18 @@ function AppPage() {
   );
 }
 
-function Stat({ label, value, variant }: { label: string; value: number; variant: "coral" | "teal" }) {
-  const cls = variant === "coral" ? "bg-coral" : "bg-teal";
-  return (
-    <div
-      className={`${cls} text-foreground py-3 text-center border-white border-4 border-solid rounded-lg shadow-lg ring-2 ring-foreground hover:scale-105 transition-transform`}
-    >
-      <div className="text-2xl font-bold">{value}</div>
-      <div className="text-xs font-semibold mt-0.5">{label}</div>
-    </div>
-  );
-}
-
 function LoadingSkeleton() {
   return (
     <>
-      {[0, 1, 2].map((i) => (
+      {[0, 1, 2, 3].map((i) => (
         <div
           key={i}
-          className="bg-surface rounded-2xl p-4 shadow-[var(--shadow-soft)] flex items-center gap-4 animate-pulse"
+          className="bg-surface rounded-2xl p-4 shadow-[var(--shadow-soft)] aspect-square animate-pulse border border-foreground/10"
         >
-          <div className="w-16 h-16 rounded-xl bg-foreground/10" />
-          <div className="flex-1 space-y-2">
-            <div className="h-4 bg-foreground/10 rounded w-2/3" />
-            <div className="h-3 bg-foreground/10 rounded w-1/2" />
-            <div className="h-3 bg-foreground/10 rounded w-1/3" />
-          </div>
+          <div className="h-3 bg-foreground/10 rounded w-1/3 mb-3" />
+          <div className="h-10 bg-foreground/10 rounded w-2/3 mb-3" />
+          <div className="h-3 bg-foreground/10 rounded w-3/4 mb-2" />
+          <div className="h-3 bg-foreground/10 rounded w-1/2" />
         </div>
       ))}
     </>
@@ -271,7 +251,7 @@ function LoadingSkeleton() {
 function EmptyState({ onAdd }: { onAdd: () => void }) {
   return (
     <div className="text-center py-14 animate-fade-in">
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-teal text-teal-foreground mb-4 ring-4 ring-white shadow-[var(--shadow-soft)]">
+      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-teal text-foreground mb-4 ring-4 ring-white shadow-[var(--shadow-soft)]">
         <CalendarPlus size={36} />
       </div>
       <p className="font-display text-xl text-foreground">No events this month.</p>
@@ -288,48 +268,48 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
   );
 }
 
+function isSameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
 function EventCard({ event, onDelete }: { event: EventRow; onDelete: () => void }) {
   const d = new Date(event.event_date);
-  const accent = event.event_type === "birthday" || event.event_type === "trip" ? "bg-coral text-coral-foreground" : "bg-teal text-teal-foreground";
+  const isAllDay = d.getHours() === 0 && d.getMinutes() === 0;
+  const isPast = d.getTime() < Date.now() && !isSameDay(d, new Date());
+  const reminderOn = !isPast;
+  const weekday = d.toLocaleDateString(undefined, { weekday: "short" }).toUpperCase();
+  const time = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: true })
+    .replace(" ", "")
+    .toUpperCase();
+
   return (
-    <div className="bg-surface rounded-2xl p-4 shadow-[var(--shadow-soft)] flex items-stretch gap-4 hover:-translate-y-0.5 hover:shadow-xl transition-all border-2 border-transparent hover:border-foreground/10">
-      <div className={`${accent} rounded-xl flex flex-col items-center justify-center w-20 shrink-0 px-2 py-2`}>
-        <div className="text-[10px] font-bold uppercase tracking-wider opacity-90">
-          {d.toLocaleDateString(undefined, { month: "short" })}
+    <div className="bg-surface rounded-2xl p-3 shadow-[var(--shadow-soft)] border border-foreground/15 flex flex-col gap-1 hover:-translate-y-0.5 hover:shadow-xl transition-all">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-1.5">
+          <span className="font-display text-lg text-foreground leading-none">{weekday}</span>
+          {reminderOn ? (
+            <BellRing size={16} className="text-teal" />
+          ) : (
+            <BellOff size={16} className="text-coral" />
+          )}
         </div>
-        <div className="font-date text-4xl leading-none mt-0.5">{d.getDate()}</div>
-        <div className="text-[10px] font-semibold mt-0.5 opacity-90">
-          {d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
-        </div>
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 text-foreground/60 text-xs font-semibold uppercase tracking-wide">
-              <span className="text-foreground/80">{TYPE_ICON[event.event_type]}</span>
-              {TYPE_LABEL[event.event_type]}
-            </div>
-            <h3 className="font-display text-xl text-foreground truncate mt-0.5">{event.title}</h3>
-          </div>
-          <button
-            onClick={onDelete}
-            aria-label="Delete"
-            className="text-coral hover:bg-coral/10 rounded-full p-1.5 transition shrink-0"
-          >
-            <Trash2 size={18} />
+        <div className="flex items-center gap-1 text-foreground/70">
+          <button aria-label="Edit" className="p-1 rounded-full hover:bg-foreground/5 transition">
+            <Pencil size={14} />
+          </button>
+          <button onClick={onDelete} aria-label="Delete" className="p-1 rounded-full hover:bg-coral/10 hover:text-coral transition">
+            <Trash2 size={14} />
           </button>
         </div>
-        {event.location && (
-          <p className="text-sm text-foreground/70 mt-1 flex items-center gap-1">
-            <MapPin size={14} /> {event.location}
-          </p>
-        )}
-        {event.description && <p className="text-sm mt-1 text-foreground/80 line-clamp-2">{event.description}</p>}
       </div>
+      <div className="font-date text-5xl text-foreground leading-none">{d.getDate()}</div>
+      <h3 className="font-display text-base text-foreground truncate mt-1">{event.title}</h3>
+      <p className="font-display text-xs text-foreground/70 uppercase tracking-wide">
+        {isAllDay ? "All Day" : time}
+      </p>
     </div>
   );
 }
-
 function EventForm({
   userId,
   onClose,
