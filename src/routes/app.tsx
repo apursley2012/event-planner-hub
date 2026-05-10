@@ -310,6 +310,7 @@ function EventCard({ event, onDelete }: { event: EventRow; onDelete: () => void 
     </div>
   );
 }
+function EventForm({
   userId,
   onClose,
   onSaved,
