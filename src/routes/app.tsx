@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search, ChevronLeft, ChevronRight, Cake, Calendar, Plane, Clock, Trash2, MapPin, CalendarPlus } from "lucide-react";
+import { Plus, Search, ChevronLeft, ChevronRight, Trash2, Pencil, BellRing, BellOff, CalendarPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
