@@ -6,7 +6,7 @@ export function AppHeader({ showBack = true, showLogout = false }: { showBack?: 
   const router = useRouter();
   const { signOut } = useAuth();
   return (
-    <header className="bg-header text-header-foreground h-14 flex items-center justify-between px-4 shadow-md">
+    <header className="bg-header text-foreground h-14 flex items-center justify-between px-4 shadow-md">
       {showBack ? (
         <button
           aria-label="Back"
