@@ -134,13 +134,6 @@ function AppPage() {
 
         <NotificationPrompt />
 
-        <div className="grid grid-cols-4 gap-3 mt-6 animate-fade-in">
-          <Stat label="Total" value={stats.total} variant="coral" />
-          <Stat label="Today" value={stats.today} variant="teal" />
-          <Stat label="Upcoming" value={stats.upcoming} variant="teal" />
-          <Stat label="Past" value={stats.past} variant="coral" />
-        </div>
-
         <div className="relative mt-6">
           <input
             className="pill-input pr-12"
@@ -151,7 +144,7 @@ function AppPage() {
           <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
         </div>
 
-        <div className="mt-6 bg-teal text-teal-foreground rounded-2xl py-3 px-4 flex items-center justify-between shadow-[var(--shadow-soft)]">
+        <div className="mt-6 bg-teal text-foreground rounded-2xl py-3 px-4 flex items-center justify-between shadow-[var(--shadow-soft)]">
           <button
             onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
             aria-label="Prev"
@@ -159,7 +152,7 @@ function AppPage() {
           >
             <ChevronLeft />
           </button>
-          <h2 className="font-display text-xl">
+          <h2 className="font-display text-xl underline decoration-2 underline-offset-4">
             {month.toLocaleDateString(undefined, { month: "long", year: "numeric" })}
           </h2>
           <button
@@ -171,15 +164,17 @@ function AppPage() {
           </button>
         </div>
 
-        <nav className="mt-5 flex gap-6 border-b border-foreground/10 overflow-x-auto">
+        <div className="mt-4 border-t-4 border-dotted border-foreground" />
+
+        <nav className="flex gap-6 overflow-x-auto py-2 justify-between">
           {TABS.map((t) => {
             const active = tab === t.key;
             return (
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`pb-2 font-display text-base whitespace-nowrap transition-colors ${
-                  active ? "text-foreground border-b-2 border-coral" : "text-foreground/60 hover:text-foreground"
+                className={`pb-1 font-display text-base whitespace-nowrap transition-colors ${
+                  active ? "text-foreground border-b-2 border-foreground" : "text-foreground/60 hover:text-foreground"
                 }`}
               >
                 {t.label}
@@ -188,11 +183,15 @@ function AppPage() {
           })}
         </nav>
 
-        <div className="mt-6 space-y-3">
+        <div className="border-t-4 border-dotted border-foreground" />
+
+        <div className="mt-5 grid grid-cols-2 gap-3">
           {loadingEvents ? (
             <LoadingSkeleton />
           ) : visible.length === 0 ? (
-            <EmptyState onAdd={() => setShowForm(true)} />
+            <div className="col-span-2">
+              <EmptyState onAdd={() => setShowForm(true)} />
+            </div>
           ) : (
             visible.map((e, i) => (
               <div
@@ -205,6 +204,8 @@ function AppPage() {
             ))
           )}
         </div>
+
+        <div className="mt-6 border-t-4 border-dotted border-foreground" />
       </main>
 
       <button
