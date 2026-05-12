@@ -185,7 +185,7 @@ function AppPage() {
 
         <div className="border-t-4 border-dotted border-foreground" />
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
+        <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {loadingEvents ? (
             <LoadingSkeleton />
           ) : visible.length === 0 ? (
