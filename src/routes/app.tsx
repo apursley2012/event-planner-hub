@@ -126,7 +126,7 @@ function AppPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <AppHeader showLogout />
-      <main className="flex-1 px-4 pt-6 pb-24 max-w-3xl mx-auto w-full">
+      <main className="flex-1 px-4 pt-6 pb-24 max-w-3xl md:max-w-4xl lg:max-w-6xl mx-auto w-full">
         <div className="flex flex-col items-center animate-fade-in">
           <Logo size={110} />
           <h1 className="font-display text-2xl mt-1 text-foreground">Upcoming Events</h1>
@@ -185,7 +185,7 @@ function AppPage() {
 
         <div className="border-t-4 border-dotted border-foreground" />
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
+        <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {loadingEvents ? (
             <LoadingSkeleton />
           ) : visible.length === 0 ? (
